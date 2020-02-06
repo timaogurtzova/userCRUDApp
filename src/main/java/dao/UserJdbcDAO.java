@@ -10,7 +10,7 @@ public class UserJdbcDAO implements UserDAO {
 
     private Connection connection;
 
-    public UserJdbcDAO (Connection connection) {
+    UserJdbcDAO (Connection connection) {
         this.connection = connection;
     }
 
