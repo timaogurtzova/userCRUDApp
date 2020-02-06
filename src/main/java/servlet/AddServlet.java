@@ -14,19 +14,21 @@ import java.io.IOException;
         urlPatterns = {"/add"}
 )
 public class AddServlet extends HttpServlet {
+
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String name = req.getParameter("name");
         String age = req.getParameter("age");
         String password = req.getParameter("password");
         String city = req.getParameter("city");
+
         try {
             int ageInt = Integer.parseInt(age);
             User user = new User(name, ageInt, password, city);
             ServiceUser.getInstance().addUserService(user);
-        }catch (NumberFormatException e){
+        } catch (NumberFormatException e) {
 
         }
-
-        }
+        getServletContext().getRequestDispatcher("/").forward(req, resp);
+    }
 }

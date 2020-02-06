@@ -13,7 +13,7 @@ public class UserDaoFactory {
         File file = new File("src/main/resources/config.properties");
         Properties property = new Properties();
 
-        try(FileInputStream fis = new FileInputStream(file)) {
+        try (FileInputStream fis = new FileInputStream(file)) {
             property.load(fis);
         } catch (IOException e) {
             System.out.println("Не удалось обнаружить файл");

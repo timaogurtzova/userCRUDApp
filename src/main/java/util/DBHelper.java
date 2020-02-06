@@ -9,8 +9,8 @@ import java.sql.SQLException;
 import java.util.Properties;
 
 public class DBHelper {
-    private static DBHelper instance;
 
+    private static DBHelper instance;
     private String jbdcDriverMySQL = "com.mysql.cj.jdbc.Driver";
     private String connectionURL = "jdbc:mysql://localhost:3306/db_user"; //db type, host name, port, db name
     private String userName = "root";
@@ -20,14 +20,14 @@ public class DBHelper {
 
     private DBHelper(){}
 
-    public static DBHelper getInstance(){
-        if (instance == null){
+    public static DBHelper getInstance() {
+        if (instance == null) {
             instance = new DBHelper();
         }
         return instance;
     }
 
-    public Connection getConnectionForJdbcDAO(){
+    public Connection getConnectionForJdbcDAO() {
         Properties properties = new Properties();
         properties.setProperty("user", userName);
         properties.setProperty("password", userPassword);
@@ -35,15 +35,14 @@ public class DBHelper {
         properties.setProperty("useSSL", useSSL);
         try {
             Class.forName(jbdcDriverMySQL);
-            Connection connection = DriverManager.getConnection(connectionURL, properties);
-            return connection;
+            return  DriverManager.getConnection(connectionURL, properties);
         } catch (SQLException | ClassNotFoundException e) {
             e.printStackTrace();
             throw new IllegalStateException();
         }
     }
 
-    public Configuration getConfigurationForHibernateDAO(){
+    public Configuration getConfigurationForHibernateDAO() {
         Configuration configuration = new Configuration();
         Properties settings = new Properties();
         settings.setProperty("useSSL", useSSL);
@@ -55,7 +54,7 @@ public class DBHelper {
 
         settings.put(Environment.DIALECT, "org.hibernate.dialect.MySQL5Dialect"); //"hibernate.dialect"
         settings.put(Environment.SHOW_SQL, "true"); //"hibernate.show_sql"
-        settings.put(Environment.HBM2DDL_AUTO, "create"); //"hibernate.hbm2ddl.auto"
+        settings.put(Environment.HBM2DDL_AUTO, "validate"); //"hibernate.hbm2ddl.auto"
         configuration.setProperties(settings);
         configuration.addAnnotatedClass(User.class);
         return configuration;

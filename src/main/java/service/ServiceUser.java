@@ -12,12 +12,12 @@ public class ServiceUser {
 
     private final UserDAO userDAO;
 
-    private ServiceUser(UserDAO userDAO){
+    private ServiceUser(UserDAO userDAO) {
         this.userDAO = userDAO;
     }
 
     public static ServiceUser getInstance() {
-        if (serviceUser == null){
+        if (serviceUser == null) {
             UserDAO createUserDAO =  new UserDaoFactory().getUserDAO();
             serviceUser = new ServiceUser(createUserDAO);
         }
@@ -44,7 +44,7 @@ public class ServiceUser {
         return user;
     }
 
-    public boolean validateUserService (long id, String name, String password){
+    public boolean validateUserService (long id, String name, String password) {
         boolean rezult = false;
         try {
             if (name !=null && password !=null)
@@ -55,7 +55,7 @@ public class ServiceUser {
         return rezult;
     }
 
-    public long getCountUserThisCityService(String city){
+    public long getCountUserThisCityService(String city) {
         long count = 0L;
         try {
             if (city != null) {
@@ -66,7 +66,7 @@ public class ServiceUser {
         return count;
     }
 
-    public void updateUserByIdService(long id, User user){
+    public void updateUserByIdService(long id, User user) {
         try {
             if (user != null){
                 userDAO.updateUserById(id, user);
@@ -76,20 +76,20 @@ public class ServiceUser {
         }
     }
 
-    public void addUserService(User user){
+    public void addUserService(User user) {
         try {
             if (user != null) {
                 userDAO.addUser(user);
             }
-        }catch (DBException e) {
+        } catch (DBException e) {
 
         }
     }
 
-    public void deleteUserById(long id){
+    public void deleteUserById(long id) {
         try {
             userDAO.deleteUserById(id);
-        }catch (DBException e){
+        } catch (DBException e) {
 
         }
     }

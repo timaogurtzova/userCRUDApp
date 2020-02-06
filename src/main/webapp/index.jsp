@@ -1,3 +1,4 @@
+<%@ page import="service.ServiceUser" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 
@@ -15,7 +16,8 @@
         <td>Password</td>
         <td>City</td>
     </tr>
-    <c:forEach items="${users}" var="user">
+
+    <c:forEach items="${ServiceUser.getInstance().getAllUserService()}" var="user">
         <tr>
             <td>${user.getId()}</td>
             <td>${user.getName()}</td>

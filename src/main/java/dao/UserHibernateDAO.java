@@ -14,16 +14,16 @@ import java.util.List;
 
 public class UserHibernateDAO implements UserDAO {
 
-    Configuration configuration;
+    private Configuration configuration;
 
-    SessionFactory sessionFactory;
+    private SessionFactory sessionFactory;
 
-    public UserHibernateDAO(Configuration configuration){
+    UserHibernateDAO(Configuration configuration) {
         this.configuration = configuration;
         sessionFactory = createSessionFactory(configuration);
     }
 
-    private SessionFactory createSessionFactory(Configuration configuration){
+    private SessionFactory createSessionFactory(Configuration configuration) {
         ServiceRegistry serviceRegistry = new StandardServiceRegistryBuilder()
                 .applySettings(configuration.getProperties())
                 .build();
@@ -32,10 +32,10 @@ public class UserHibernateDAO implements UserDAO {
 
     @Override
     public List<User> getAllUser() throws DBException {
-        List<User> users = null;
+        List<User> users;
 
         try (Session session = sessionFactory.openSession()) {
-            Query query = session.createQuery("SELECT user FROM User user");
+            Query<User> query = session.createQuery("SELECT user FROM User user");
             users = query.list();
         } catch (HibernateException e) {
           throw new DBException(e);
@@ -45,20 +45,20 @@ public class UserHibernateDAO implements UserDAO {
 
     @Override
     public User getUserById(long id) throws DBException {
-        User user = null;
+        User user;
 
-        try(Session session = sessionFactory.openSession()){
-            user = (User) session.get(User.class, id);
-        }catch (HibernateException e){
+        try (Session session = sessionFactory.openSession()) {
+            user = session.get(User.class, id);
+        } catch (HibernateException e) {
             throw new DBException(e);
         }
         return user;
     }
 
     @Override
-    public boolean validateUser(long id, String name, String password) throws DBException{
-        User user = null;
-        try(Session session = sessionFactory.openSession()) {
+    public boolean validateUser(long id, String name, String password) throws DBException {
+        User user;
+        try (Session session = sessionFactory.openSession()) {
             Query query = session.createQuery(
                     "SELECT u FROM User u WHERE u.name =:nameUser " +
                             "AND u.password =:passwordUser " +
@@ -68,40 +68,47 @@ public class UserHibernateDAO implements UserDAO {
                     .setParameter("idUser", id)
                     .setMaxResults(1);
             user = (User) query.uniqueResult();
-        }catch (HibernateException e){
+        } catch (HibernateException e) {
             throw new DBException(e);
         }
 
-        if (user == null){
+        if (user == null) {
             return false;
         }
+
         return true;
     }
 
     @Override
-    public long getCountUserThisCity(String city) {
-        Session session = sessionFactory.openSession();
+    public long getCountUserThisCity(String city) throws DBException {
+        long result;
+        try(Session session = sessionFactory.openSession()) {
         Query query = session.createQuery("SELECT COUNT (user) FROM User user WHERE user.city =:parameter")
                 .setParameter("parameter", city);
-        long result = (Long)query.uniqueResult();
+        result = (Long)query.uniqueResult();
+        } catch (HibernateException e) {
+            throw new DBException(e);
+        }
         return result;
     }
 
     @Override
     public void updateUserById(long id, User newParameterUser) throws DBException {
-        try( Session session = sessionFactory.openSession()){
-            User user = (User)session.get(User.class, id);
+        try (Session session = sessionFactory.openSession()) {
+            Transaction transaction = session.beginTransaction();
+            User user = session.get(User.class, id);
             user.setName(newParameterUser.getName());
             user.setAge(newParameterUser.getAge());
             user.setPassword(newParameterUser.getPassword());
             user.setCity(newParameterUser.getCity());
-        }catch (HibernateException e){
+            transaction.commit();
+        } catch (HibernateException e) {
             throw new DBException(e);
         }
     }
 
     @Override
-    public void addUser(User user) throws DBException{
+    public void addUser(User user) throws DBException {
         try (Session session = sessionFactory.openSession()) {
             Transaction transaction = session.beginTransaction();
             session.persist(user);
@@ -113,11 +120,13 @@ public class UserHibernateDAO implements UserDAO {
 
     @Override
     public void deleteUserById(long id) throws DBException {
-        try(Session session = sessionFactory.openSession()){
-        Query query = session.createQuery("DELETE FROM User WHERE id =:param");
-        query.setParameter("param", id);
-        query.executeUpdate();
-        }catch (HibernateException e){
+        try (Session session = sessionFactory.openSession()) {
+            Transaction transaction = session.beginTransaction();
+            Query query = session.createQuery("DELETE FROM User WHERE id =:param");
+            query.setParameter("param", id);
+            query.executeUpdate();
+            transaction.commit();
+        } catch (HibernateException e) {
             throw new DBException(e);
         }
     }
